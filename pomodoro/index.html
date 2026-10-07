@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pomodoro & Focus Timer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow" aria-hidden="true"></div>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <p class="eyebrow">Focus session</p>
+          <h1>Pomodoro & Focus Timer</h1>
+        </div>
+        <div class="header-actions">
+          <div class="lang-switch" role="group" aria-label="Language">
+            <button type="button" class="chip-btn is-active" id="lang-ja" data-lang="ja">JP</button>
+            <button type="button" class="chip-btn" id="lang-vi" data-lang="vi">VI</button>
+          </div>
+          <button type="button" class="chip-btn" id="theme-btn" aria-pressed="false">
+            <span data-i18n="themeDark">ダーク</span>
+          </button>
+          <button type="button" class="btn btn-primary btn-compact" id="login-btn" data-i18n="login">ログイン</button>
+          <div class="user-chip is-hidden" id="user-chip">
+            <img class="avatar" id="user-avatar" alt="" />
+            <span class="user-name" id="user-name"></span>
+            <button type="button" class="link-btn" id="logout-btn" data-i18n="logout">ログアウト</button>
+          </div>
+        </div>
+      </header>
+      <p class="lede" data-i18n="lede">25分集中して、ひとつずつ完了させるシンプルなタイマーです。</p>
+
+      <section class="card profile-card" aria-labelledby="profile-heading">
+        <div class="profile">
+          <img class="profile-photo" src="12.jpg" alt="プロフィール画像" data-i18n-alt="profileAlt" />
+          <div class="profile-body">
+            <h2 id="profile-heading" data-i18n="profile">自己紹介</h2>
+            <p class="card-copy" data-i18n="profileCopy">ポモドーロで集中時間をつくるのが好きです。雨音を聞きながら、25分ずつ丁寧に進めます。</p>
+          </div>
+        </div>
+      </section>
+
+      <dialog class="modal" id="login-modal" aria-labelledby="login-title">
+        <form class="modal-form" id="login-form">
+          <h2 id="login-title" data-i18n="login">ログイン</h2>
+          <p class="card-copy" data-i18n="loginCopy">名前とアバター画像を保存して、次回から自動で表示します。</p>
+          <label class="field">
+            <span data-i18n="userName">ユーザー名</span>
+            <input type="text" id="login-name" name="name" required maxlength="24" data-i18n-placeholder="namePlaceholder" placeholder="山田 太郎" autocomplete="username" />
+          </label>
+          <label class="field">
+            <span data-i18n="avatar">アバター画像</span>
+            <input type="file" id="login-avatar" name="avatar" accept="image/*" />
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="login-cancel" data-i18n="cancel">キャンセル</button>
+            <button type="submit" class="btn btn-primary" data-i18n="login">ログイン</button>
+          </div>
+        </form>
+      </dialog>
+
+      <section class="card timer-card" aria-labelledby="timer-heading">
+        <div class="card-head">
+          <h2 id="timer-heading" data-i18n="timer">タイマー</h2>
+          <span class="status-pill" id="timer-status">待機中</span>
+        </div>
+        <div class="mode-switch" role="group" aria-label="Timer mode">
+          <button type="button" class="mode-btn is-active" data-mode="focus" data-i18n="modeFocus">25分集中</button>
+          <button type="button" class="mode-btn" data-mode="short" data-i18n="modeShort">5分小休憩</button>
+          <button type="button" class="mode-btn" data-mode="long" data-i18n="modeLong">15分長休憩</button>
+        </div>
+        <p class="time" id="time-display" aria-live="polite">25:00</p>
+        <div class="progress" aria-hidden="true">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="controls">
+          <button type="button" class="btn btn-primary" id="start-btn" data-i18n="start">スタート</button>
+          <button type="button" class="btn btn-ghost" id="pause-btn" data-i18n="pause">一時停止</button>
+          <button type="button" class="btn btn-ghost" id="reset-btn" data-i18n="reset">リセット</button>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card" aria-labelledby="todo-heading">
+          <div class="card-head">
+            <h2 id="todo-heading" data-i18n="todo">ミニTo-Do</h2>
+            <span class="status-pill" id="todo-status" data-i18n="todoEmpty">未設定</span>
+          </div>
+          <form class="todo-form" id="todo-form">
+            <label class="field">
+              <span data-i18n="taskName">今から集中するタスク</span>
+              <input type="text" id="todo-input" maxlength="40" data-i18n-placeholder="todoPlaceholder" placeholder="履歴書を仕上げる" required />
+            </label>
+            <button type="submit" class="btn btn-primary" data-i18n="todoSet">セット</button>
+          </form>
+          <p class="task-title" id="todo-title" data-i18n="todoNone">まだタスクがありません</p>
+          <button type="button" class="btn btn-ghost" id="todo-clear" data-i18n="todoClear">クリア</button>
+        </section>
+
+        <section class="card" aria-labelledby="stats-heading">
+          <div class="card-head">
+            <h2 id="stats-heading" data-i18n="stats">今日の実績</h2>
+            <span class="muted" id="today-label"></span>
+          </div>
+          <p class="stats" id="stats-display">🍅 × 0</p>
+          <p class="card-copy" data-i18n="statsCopy">今日完了したポモドーロ回数です。ブラウザに自動保存されます。</p>
+        </section>
+      </div>
+
+      <section class="card stats-card" aria-labelledby="focus-stats-heading">
+        <div class="card-head">
+          <h2 id="focus-stats-heading">Focus Stats</h2>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-box">
+            <p class="muted" data-i18n="todayMinutesLabel">本日の合計集中時間</p>
+            <p class="stats" id="today-minutes">0<span class="unit" data-i18n="minutesUnit">分</span></p>
+          </div>
+          <div class="stat-box">
+            <p class="muted" data-i18n="todayCountLabel">完了ポモドーロ数</p>
+            <p class="stats" id="today-count">0</p>
+          </div>
+        </div>
+        <p class="chart-label" data-i18n="weekChart">過去7日間の達成度</p>
+        <div class="chart" id="week-chart"></div>
+      </section>
+
+      <section class="card" aria-labelledby="bgm-heading">
+        <div class="card-head">
+          <h2 id="bgm-heading" data-i18n="bgm">BGM</h2>
+          <span class="status-pill" id="bgm-status">停止中</span>
+        </div>
+        <p class="card-copy" data-i18n="bgmCopy">集中用の雨の音をループ再生します。</p>
+        <audio id="rain-audio" src="rain.mp3" loop preload="auto"></audio>
+        <button type="button" class="btn btn-accent" id="bgm-btn" aria-pressed="false" data-i18n="bgmPlay">雨の音を再生</button>
+      </section>
+    </main>
+
+    <audio id="chime-audio" src="chime.mp3" preload="auto"></audio>
+    <div class="toast" id="complete-toast" role="status" aria-live="assertive" hidden>
+      <p class="toast-title" id="toast-title">集中タイム終了！</p>
+      <p class="card-copy" id="toast-copy"></p>
+      <button type="button" class="btn btn-primary" id="toast-close" data-i18n="close">閉じる</button>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
